@@ -75,7 +75,7 @@ def get_args_parser():
                         help="Dropout applied in the transformer")
     parser.add_argument('--nheads', default=8, type=int,
                         help="Number of attention heads inside the transformer's attentions")
-    parser.add_argument('--num_queries', default=5, type=int,
+    parser.add_argument('--num_queries', default=1, type=int,
                         help="Number of query slots")
     parser.add_argument('--dec_n_points', default=4, type=int)
     parser.add_argument('--enc_n_points', default=4, type=int)
@@ -292,13 +292,9 @@ def main(args):
                     'args': args,
                 }, checkpoint_path)
 
-        if (epoch + 1) % 3 == 0:
-            test_stats, coco_evaluator = evaluate(
-                model, criterion, postprocessors, data_loader_val, base_ds, device, args.output_dir
-            )
-        else:
-            test_stats = {}
-            coco_evaluator = None
+        test_stats, coco_evaluator = evaluate(
+            model, criterion, postprocessors, data_loader_val, base_ds, device, args.output_dir
+        )
 
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                      **{f'test_{k}': v for k, v in test_stats.items()},
