@@ -234,8 +234,9 @@ def main(args):
         else:
             checkpoint = torch.load(args.resume, map_location='cpu')
 
-        del checkpoint["model"]["class_embed.weight"]
-        del checkpoint["model"]["class_embed.bias"]
+        for i in range(6):
+            del checkpoint["model"][f"class_embed.{i}.weight"]
+            del checkpoint["model"][f"class_embed.{i}.bias"]
         del checkpoint["model"]["query_embed.weight"]
 
         missing_keys, unexpected_keys = model_without_ddp.load_state_dict(checkpoint['model'], strict=False)
@@ -277,7 +278,7 @@ def main(args):
 
     print("Start training")
     start_time = time.time()
-    for epoch in range(args.start_epoch, args.epochs):
+    for epoch in range(0, args.epochs):
         if args.distributed:
             sampler_train.set_epoch(epoch)
         train_stats = train_one_epoch(
